@@ -122,6 +122,15 @@ function slugify(str) {
 }
 
 /* ---------- Screen navigation ---------- */
+function goToMenu() {
+  const splash = document.getElementById('screen-splash');
+  splash.classList.add('is-leaving');
+  setTimeout(function () {
+    splash.classList.remove('is-leaving');
+    showScreen('menu');
+  }, 480);
+}
+
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('screen--active'); });
   const target = document.getElementById('screen-' + name);
@@ -289,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
   renderSports('All');
 
   const continueBtn = document.getElementById('continueBtn');
-  if (continueBtn) continueBtn.addEventListener('click', function () { showScreen('menu'); });
+  if (continueBtn) continueBtn.addEventListener('click', goToMenu);
 
   document.querySelectorAll('[data-target]').forEach(function (el) {
     el.addEventListener('click', function () { showScreen(el.dataset.target); });

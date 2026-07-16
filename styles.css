@@ -80,9 +80,37 @@ select:focus-visible {
 
 /* ---------- Screen management ---------- */
 .screen { display: none; }
-.screen--active { display: block; animation: fadeIn 0.4s ease; }
+.screen--active { display: block; animation: fadeIn 0.5s cubic-bezier(.22,.61,.36,1); }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Splash exit — plays on #screen-splash right before it's swapped out */
+#screen-splash.is-leaving .splash__content {
+  animation: splashExit 0.5s ease forwards;
+}
+#screen-splash.is-leaving .splash__watermark {
+  animation: watermarkExit 0.5s ease forwards;
+}
+@keyframes splashExit {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-26px) scale(0.94); }
+}
+@keyframes watermarkExit {
+  to { opacity: 0; transform: scale(1.08); }
+}
+
+/* Menu cards cascade in, one after another, whenever the menu screen shows */
+.menu-card {
+  opacity: 0;
+  animation: cardRise 0.55s cubic-bezier(.22,.61,.36,1) forwards;
+}
+.menu-card:nth-child(1) { animation-delay: 0.05s; }
+.menu-card:nth-child(2) { animation-delay: 0.18s; }
+.menu-card:nth-child(3) { animation-delay: 0.31s; }
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -146,6 +174,7 @@ select:focus-visible {
   box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
 }
+.btn-primary:active { transform: scale(0.96); }
 .btn-secondary {
   background: transparent;
   border: 1px solid var(--border);
