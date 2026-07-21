@@ -116,9 +116,16 @@ const CLUBS = [
 
 /* ---------- State ---------- */
 let scheduleState = {}; // e.g. { A: 'Algebra I', J: 'AP Statistics' }
+let courseSearchQuery = '';
 
 function slugify(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function escapeHTML(str) {
+  return String(str).replace(/[&<>"']/g, function (ch) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+  });
 }
 
 /* ---------- Screen navigation ---------- */
@@ -177,10 +184,19 @@ function courseCardHTML(course, id, showNode) {
 function renderCourses() {
   const container = document.getElementById('coursesContainer');
   if (!container) return;
-  container.innerHTML = COURSE_GROUPS.map(function (group) {
-    const cards = group.courses.map(function (c, i) {
-      return courseCardHTML(c, slugify(group.subject) + '-' + i, group.path);
+
+  const query = courseSearchQuery.trim().toLowerCase();
+
+  const groupsHTML = COURSE_GROUPS.map(function (group) {
+    const matches = query
+      ? group.courses.filter(function (c) { return c.name.toLowerCase().indexOf(query) !== -1; })
+      : group.courses;
+    if (!matches.length) return '';
+
+    const cards = matches.map(function (c) {
+      return courseCardHTML(c, slugify(group.subject) + '-' + slugify(c.name), group.path);
     }).join('');
+
     return (
       '<div class="subject-group">' +
         '<h2 class="subject-group__title">' + group.subject + '</h2>' +
@@ -188,6 +204,10 @@ function renderCourses() {
       '</div>'
     );
   }).join('');
+
+  container.innerHTML = groupsHTML || (
+    '<p class="search-empty">No classes match \u201c' + escapeHTML(courseSearchQuery) + '\u201d. Try a different search.</p>'
+  );
   attachCourseEvents();
 }
 
@@ -303,6 +323,25 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('[data-target]').forEach(function (el) {
     el.addEventListener('click', function () { showScreen(el.dataset.target); });
   });
+
+  const courseSearch = document.getElementById('courseSearch');
+  const courseSearchClear = document.getElementById('courseSearchClear');
+  if (courseSearch) {
+    courseSearch.addEventListener('input', function (e) {
+      courseSearchQuery = e.target.value;
+      courseSearchClear.hidden = courseSearchQuery.length === 0;
+      renderCourses();
+    });
+  }
+  if (courseSearchClear) {
+    courseSearchClear.addEventListener('click', function () {
+      courseSearchQuery = '';
+      courseSearch.value = '';
+      courseSearchClear.hidden = true;
+      renderCourses();
+      courseSearch.focus();
+    });
+  }
 
   const resetBtn = document.getElementById('resetScheduleBtn');
   if (resetBtn) {
