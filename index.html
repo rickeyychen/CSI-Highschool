@@ -17,18 +17,34 @@
 <section class="screen screen--active" id="screen-splash">
   <div class="splash">
     <svg class="splash__watermark" viewBox="0 0 400 400" aria-hidden="true">
-      <circle cx="200" cy="200" r="180" fill="none" stroke="currentColor" stroke-width="1.5"/>
-      <ellipse cx="200" cy="200" rx="70" ry="180" fill="none" stroke="currentColor" stroke-width="1.5"/>
-      <ellipse cx="200" cy="200" rx="140" ry="180" fill="none" stroke="currentColor" stroke-width="1.5"/>
-      <line x1="20" y1="200" x2="380" y2="200" stroke="currentColor" stroke-width="1.5"/>
-      <line x1="35" y1="120" x2="365" y2="120" stroke="currentColor" stroke-width="1.5"/>
-      <line x1="35" y1="280" x2="365" y2="280" stroke="currentColor" stroke-width="1.5"/>
+      <circle class="wm-line wm-d1" cx="200" cy="200" r="180" fill="none" stroke="currentColor" stroke-width="1.5" pathLength="1"/>
+      <ellipse class="wm-line wm-d2" cx="200" cy="200" rx="70" ry="180" fill="none" stroke="currentColor" stroke-width="1.5" pathLength="1"/>
+      <ellipse class="wm-line wm-d3" cx="200" cy="200" rx="140" ry="180" fill="none" stroke="currentColor" stroke-width="1.5" pathLength="1"/>
+      <ellipse class="wm-line wm-d4" cx="200" cy="200" rx="180" ry="110" fill="none" stroke="currentColor" stroke-width="1.5" pathLength="1"/>
+      <line class="wm-line wm-d5" x1="20" y1="200" x2="380" y2="200" stroke="currentColor" stroke-width="1.5" pathLength="1"/>
+      <line class="wm-line wm-d6" x1="35" y1="120" x2="365" y2="120" stroke="currentColor" stroke-width="1.5" pathLength="1"/>
+      <line class="wm-line wm-d7" x1="35" y1="280" x2="365" y2="280" stroke="currentColor" stroke-width="1.5" pathLength="1"/>
+      <g class="wm-ticks">
+        <rect class="wm-tick" x="196" y="14" width="8" height="8"/>
+        <rect class="wm-tick" x="196" y="378" width="8" height="8"/>
+        <rect class="wm-tick" x="14" y="196" width="8" height="8"/>
+        <rect class="wm-tick" x="378" y="196" width="8" height="8"/>
+      </g>
     </svg>
     <div class="splash__content">
-      <img src="csi-logo.png" alt="College of Staten Island High School for International Studies seal" class="splash__logo">
+      <div class="splash__seal">
+        <img src="csi-logo.png" alt="College of Staten Island High School for International Studies seal" class="splash__logo">
+      </div>
       <h1 class="splash__title">CSI High School</h1>
+      <div class="splash__divider" aria-hidden="true"></div>
       <p class="splash__subtitle">College of Staten Island High School for International Studies</p>
-      <button class="btn-primary" id="continueBtn" type="button">Click to Continue</button>
+      <button class="btn-primary" id="continueBtn" type="button">
+        <span>Click to Continue</span>
+        <svg class="btn-primary__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
     </div>
   </div>
 </section>
@@ -93,6 +109,16 @@
     <p class="eyebrow">Plan ahead</p>
     <h1>Class Availability</h1>
     <p>Open a course to see its prerequisites. If you qualify and know which block you'll take it in, add it straight to your Schedule.</p>
+    <div class="search-field">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="courseSearch" placeholder="Search classes by name…" aria-label="Search classes by name">
+      <button type="button" class="search-field__clear" id="courseSearchClear" aria-label="Clear search" hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <div id="coursesContainer"></div>
   </div>
 </section>
