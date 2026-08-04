@@ -1,39 +1,21 @@
-/* ============================================================
-   CSI High School — Site data & interactivity
-   Edit the data arrays below (COURSE_GROUPS, SPORTS, CLUBS) to
-   change site content — the page renders itself from this data.
-   ============================================================ */
-
-/* ---------- Data: Class Availability ---------- */
 const BLOCKS = ['0', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J'];
 
 const COURSE_GROUPS = [
-  {
-    subject: 'Global History & History',
-    path: true,
-    courses: [
+  { subject: 'Global History & History', path: true, courses: [
       { name: 'Global History (9th Grade)', prereq: 'None.' },
       { name: 'Global History (10th Grade)', prereq: 'None. This course concludes with the Global History Regents exam.' },
       { name: 'US History', prereq: 'Completed Global History and passed the Regents exam.' },
       { name: 'AP US History', prereq: 'Completed and excelled in Global History, and passed the Regents exam.' },
       { name: 'AP Comparative Government and Politics', prereq: 'Completed US History or AP US History.' }
-    ]
-  },
-  {
-    subject: 'Science',
-    path: true,
-    courses: [
+  ]},
+  { subject: 'Science', path: true, courses: [
       { name: 'Earth Science', prereq: 'None.' },
       { name: 'Biology', prereq: 'Passed Earth Science.' },
       { name: 'Chemistry', prereq: 'Passed Biology.' },
       { name: 'Physics', prereq: 'Passed Chemistry.', note: 'Meets during Block 0.' },
       { name: 'AP Biology', prereq: 'Excelled in Biology.' }
-    ]
-  },
-  {
-    subject: 'English',
-    path: true,
-    courses: [
+  ]},
+  { subject: 'English', path: true, courses: [
       { name: 'English (9th Grade)', prereq: 'None.' },
       { name: 'English (10th Grade)', prereq: 'Passed 9th Grade English.' },
       { name: 'AP Seminar', prereq: 'Excelled in 9th Grade English.', note: 'Open to 10th graders only.' },
@@ -42,34 +24,24 @@ const COURSE_GROUPS = [
       { name: 'AP English Language and Composition', prereq: 'Excelled in 10th Grade English or AP Seminar.' },
       { name: 'Honors English (12th Grade)', prereq: 'Passed 11th Grade English.' },
       { name: 'AP English Literature', prereq: 'Excelled in 11th Grade English or AP English Language and Composition.' }
-    ]
-  },
-  {
-    subject: 'Math',
-    path: true,
-    courses: [
+  ]},
+  { subject: 'Math', path: true, courses: [
       { name: 'Algebra I', prereq: 'None.' },
       { name: 'Geometry', prereq: 'Passed Algebra I.' },
       { name: 'Algebra II', prereq: 'Passed Geometry.' },
       { name: 'Honors Pre-Calculus', prereq: 'Excelled in Algebra II.' },
       { name: 'AP Calculus AB', prereq: 'Excelled in Pre-Calculus.' }
-    ]
-  },
-  {
-    subject: 'Block J Electives (APEX)',
-    path: false,
-    courses: [
+  ]},
+  { subject: 'Block J Electives (APEX)', path: false, courses: [
       { name: 'AP Statistics', prereq: 'Passed Algebra II.', note: 'Block J, APEX class.' },
       { name: 'AP Microeconomics', prereq: 'Passed Algebra II.', note: 'Block J, APEX class.' },
       { name: 'AP Macroeconomics', prereq: 'Passed Pre-Calculus.', note: 'Block J, APEX class.' },
       { name: 'AP Spanish', prereq: 'Completed three years of Spanish and passed the Spanish LOTE exam.', note: 'Block J, APEX class.' },
       { name: 'AP US Government', prereq: 'Completed 9th and 10th grade Global History.', note: 'Block J, APEX class.' },
       { name: 'AP Psychology', prereq: 'Completed 9th Grade Global History.', note: 'Block J, APEX class.' }
-    ]
-  }
+  ]}
 ];
 
-/* ---------- Data: Sports ---------- */
 const SPORTS = [
   { name: 'Baseball', team: 'Boys Varsity', season: 'Spring', type: 'Open tryouts' },
   { name: 'Basketball', team: 'Boys Junior Varsity', season: 'Winter', type: 'Open tryouts', note: 'Open to 9th and 10th graders only.' },
@@ -93,13 +65,12 @@ const SPORTS = [
   { name: 'Wrestling', team: 'Boys Varsity', season: 'Winter', type: 'No-cut tryouts' }
 ];
 
-/* ---------- Data: Clubs ---------- */
 const CLUBS = [
   { name: 'Animal and Environmental Justice Club', meets: 'Meets once a month.' },
   { name: 'Arts and Crafts Club', meets: 'Meets every Monday.' },
   { name: 'Chess Club', meets: 'Meets Thursdays, twice a month.' },
   { name: 'Chinese Culture Club', meets: 'Meets once a month.' },
-  { name: 'Debate Team', meets: 'Meets Wednesdays and Thursdays after school, 3:00\u20134:00 p.m.' },
+  { name: 'Debate Team', meets: 'Meets Wednesdays and Thursdays after school, 3:00-4:00 p.m.' },
   { name: 'Dungeons and Dragons Club', meets: 'Meets Thursdays, twice a month.' },
   { name: 'Jewish Student Alliance', meets: 'Meets once a month.' },
   { name: 'Love Is Our Niche (LION Club)', meets: 'Meeting day and time will be announced.' },
@@ -114,8 +85,7 @@ const CLUBS = [
   { name: 'Film and Media Studies Club', meets: 'Meets Wednesdays and Fridays.' }
 ];
 
-/* ---------- State ---------- */
-let scheduleState = {}; // e.g. { A: 'Algebra I', J: 'AP Statistics' }
+let scheduleState = {};
 let courseSearchQuery = '';
 
 function slugify(str) {
@@ -128,7 +98,23 @@ function escapeHTML(str) {
   });
 }
 
-/* ---------- Screen navigation ---------- */
+const THEME_KEY = 'csihs-theme';
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+    btn.setAttribute('aria-pressed', String(theme === 'dark'));
+    btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  });
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+}
+
 function goToMenu() {
   const splash = document.getElementById('screen-splash');
   splash.classList.add('is-leaving');
@@ -142,20 +128,17 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('screen--active'); });
   const target = document.getElementById('screen-' + name);
   if (target) target.classList.add('screen--active');
-
   const nav = document.getElementById('siteNav');
   const footer = document.getElementById('siteFooter');
   const isSplash = name === 'splash';
   nav.hidden = isSplash;
   footer.hidden = isSplash;
-
   document.querySelectorAll('.nav-link').forEach(function (l) {
     l.classList.toggle('is-active', l.dataset.target === name);
   });
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-/* ---------- Class Availability rendering ---------- */
 function courseCardHTML(course, id, showNode) {
   const noteHTML = course.note ? '<p class="course__note">' + course.note + '</p>' : '';
   const options = BLOCKS.map(function (b) { return '<option value="' + b + '">Block ' + b + '</option>'; }).join('');
@@ -171,7 +154,7 @@ function courseCardHTML(course, id, showNode) {
         noteHTML +
         '<div class="course__add">' +
           '<select class="course__block-select" id="select-' + id + '" aria-label="Choose a block for ' + course.name + '">' +
-            '<option value="">Choose a block\u2026</option>' + options +
+            '<option value="">Choose a block...</option>' + options +
           '</select>' +
           '<button type="button" class="btn-add" data-add-id="' + id + '" data-course-name="' + course.name + '">Add to Schedule</button>' +
           '<span class="course__confirm" id="confirm-' + id + '" aria-live="polite"></span>' +
@@ -184,19 +167,15 @@ function courseCardHTML(course, id, showNode) {
 function renderCourses() {
   const container = document.getElementById('coursesContainer');
   if (!container) return;
-
   const query = courseSearchQuery.trim().toLowerCase();
-
   const groupsHTML = COURSE_GROUPS.map(function (group) {
     const matches = query
       ? group.courses.filter(function (c) { return c.name.toLowerCase().indexOf(query) !== -1; })
       : group.courses;
     if (!matches.length) return '';
-
     const cards = matches.map(function (c) {
       return courseCardHTML(c, slugify(group.subject) + '-' + slugify(c.name), group.path);
     }).join('');
-
     return (
       '<div class="subject-group">' +
         '<h2 class="subject-group__title">' + group.subject + '</h2>' +
@@ -204,9 +183,8 @@ function renderCourses() {
       '</div>'
     );
   }).join('');
-
   container.innerHTML = groupsHTML || (
-    '<p class="search-empty">No classes match \u201c' + escapeHTML(courseSearchQuery) + '\u201d. Try a different search.</p>'
+    '<p class="search-empty">No classes match your search.</p>'
   );
   attachCourseEvents();
 }
@@ -221,7 +199,6 @@ function attachCourseEvents() {
       body.classList.toggle('course__body--open', !expanded);
     });
   });
-
   document.querySelectorAll('.btn-add').forEach(function (btn) {
     btn.addEventListener('click', function () {
       const id = btn.dataset.addId;
@@ -242,7 +219,6 @@ function attachCourseEvents() {
   });
 }
 
-/* ---------- Schedule rendering ---------- */
 function renderSchedule() {
   const grid = document.getElementById('scheduleGrid');
   if (!grid) return;
@@ -256,7 +232,6 @@ function renderSchedule() {
       '</div>'
     );
   }).join('');
-
   grid.querySelectorAll('.schedule-row__input').forEach(function (input) {
     input.addEventListener('input', function (e) {
       scheduleState[e.target.dataset.block] = e.target.value;
@@ -264,7 +239,6 @@ function renderSchedule() {
   });
 }
 
-/* ---------- Extracurricular: Sports ---------- */
 function renderSports(filter) {
   const container = document.getElementById('sportsContainer');
   if (!container) return;
@@ -288,7 +262,6 @@ function renderSports(filter) {
   }).join('');
 }
 
-/* ---------- Extracurricular: Clubs ---------- */
 function renderClubs() {
   const container = document.getElementById('clubsContainer');
   if (!container) return;
@@ -310,12 +283,16 @@ function showExtraTab(tab) {
   });
 }
 
-/* ---------- Init ---------- */
 document.addEventListener('DOMContentLoaded', function () {
   renderCourses();
   renderSchedule();
   renderClubs();
   renderSports('All');
+
+  applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
+  document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+    btn.addEventListener('click', toggleTheme);
+  });
 
   const continueBtn = document.getElementById('continueBtn');
   if (continueBtn) continueBtn.addEventListener('click', goToMenu);
