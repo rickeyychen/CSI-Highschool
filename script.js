@@ -115,7 +115,8 @@ function escapeHTML(str) {
 }
 
 const THEME_KEY = 'csihs-theme';
-const SCREEN_KEY = 'csihs-screen';
+const SCREEN_HASHES = ['menu', 'classes', 'schedule', 'extracurricular']; // splash = no hash
+let currentScreen = 'splash';
 
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
@@ -132,16 +133,32 @@ function toggleTheme() {
   try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
 }
 
+/* ---------- Routing ----------
+   The URL hash is the single source of truth for which screen is showing.
+   No hash = splash. Every other screen gets #menu / #classes / #schedule /
+   #extracurricular. This makes refresh, deep-links, and browser back/forward
+   all fall out of the same mechanism instead of three separate ones. */
+
+function screenFromHash() {
+  const h = location.hash.replace('#', '');
+  return SCREEN_HASHES.indexOf(h) !== -1 ? h : 'splash';
+}
+
 function goToMenu() {
   const splash = document.getElementById('screen-splash');
   splash.classList.add('is-leaving');
   setTimeout(function () {
     splash.classList.remove('is-leaving');
-    showScreen('menu');
+    navigateToScreen('menu');
   }, 480);
 }
 
-function showScreen(name) {
+// Pure DOM update — no history side effects. Used for the initial load and
+// for popstate (back/forward), where the browser has already moved and we
+// must not push another entry on top of it.
+function renderScreen(name) {
+  currentScreen = name;
+  document.getElementById('screen-splash').classList.remove('is-leaving');
   document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('screen--active'); });
   const target = document.getElementById('screen-' + name);
   if (target) target.classList.add('screen--active');
@@ -153,9 +170,28 @@ function showScreen(name) {
   document.querySelectorAll('.nav-link').forEach(function (l) {
     l.classList.toggle('is-active', l.dataset.target === name);
   });
-  try { sessionStorage.setItem(SCREEN_KEY, name); } catch (e) { /* private browsing, etc. — screen just won't persist */ }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
+
+// User-initiated navigation (clicks) — updates the DOM AND pushes a real
+// history entry, which is what makes the browser back/forward buttons work.
+function navigateToScreen(name) {
+  if (name === currentScreen) return; // already there — don't pad the back-stack with no-ops
+  const path = location.pathname + location.search + (name === 'splash' ? '' : '#' + name);
+  try { history.pushState({ screen: name }, '', path); } catch (e) { /* pushState unavailable — screen still changes, just won't be back/forward-able */ }
+  renderScreen(name);
+}
+
+window.addEventListener('popstate', function () {
+  renderScreen(screenFromHash());
+});
+
+// Covers the rare case of someone hand-editing the hash in the address bar —
+// popstate alone only fires for back/forward, not a typed-and-entered edit.
+// renderScreen is idempotent, so if both fire for the same change, it's harmless.
+window.addEventListener('hashchange', function () {
+  renderScreen(screenFromHash());
+});
 
 function courseCardHTML(course, id, showNode) {
   const name = escapeHTML(course.name);
@@ -316,19 +352,20 @@ document.addEventListener('DOMContentLoaded', function () {
     btn.addEventListener('click', toggleTheme);
   });
 
-  const validScreens = ['menu', 'classes', 'schedule', 'extracurricular'];
-  let savedScreen = null;
-  try { savedScreen = sessionStorage.getItem(SCREEN_KEY); } catch (e) { /* private browsing, etc. */ }
-  if (savedScreen && validScreens.indexOf(savedScreen) !== -1) {
-    showScreen(savedScreen); // also clears the data-restore-screen flash-guard below, since the real state now matches
-  }
-  document.documentElement.removeAttribute('data-restore-screen');
+  // The initial screen comes straight from the URL — a fresh visit (no hash)
+  // is splash; a refresh or a shared/bookmarked link with a hash goes
+  // straight to that screen. replaceState (not pushState) because this is
+  // establishing the current entry, not creating a new one.
+  const initialScreen = screenFromHash();
+  try { history.replaceState({ screen: initialScreen }, '', location.href); } catch (e) { /* history API unavailable — screen still renders correctly, just without state attached */ }
+  renderScreen(initialScreen);
+  document.documentElement.removeAttribute('data-restore-screen'); // flash-guard's job is done; renderScreen above is now the real state
 
   const continueBtn = document.getElementById('continueBtn');
   if (continueBtn) continueBtn.addEventListener('click', goToMenu);
 
   document.querySelectorAll('[data-target]').forEach(function (el) {
-    el.addEventListener('click', function () { showScreen(el.dataset.target); });
+    el.addEventListener('click', function () { navigateToScreen(el.dataset.target); });
   });
 
   const courseSearch = document.getElementById('courseSearch');
