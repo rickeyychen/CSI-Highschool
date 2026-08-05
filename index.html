@@ -11,12 +11,12 @@
       document.documentElement.setAttribute('data-theme', stored || 'light');
     } catch (e) { /* localStorage unavailable — default to light */ }
     try {
-      var savedScreen = localStorage.getItem('csihs-screen');
+      var savedScreen = sessionStorage.getItem('csihs-screen');
       var validScreens = ['menu', 'classes', 'schedule', 'extracurricular'];
       if (savedScreen && validScreens.indexOf(savedScreen) !== -1) {
         document.documentElement.setAttribute('data-restore-screen', savedScreen);
       }
-    } catch (e) { /* localStorage unavailable — starts on the splash screen as usual */ }
+    } catch (e) { /* sessionStorage unavailable — starts on the splash screen as usual */ }
   })();
 </script>
 <meta name="description" content="CSI High School for International Studies — class availability, schedule planning, and extracurricular activities.">
