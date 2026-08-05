@@ -85,7 +85,23 @@ const CLUBS = [
   { name: 'Film and Media Studies Club', meets: 'Meets Wednesdays and Fridays.' }
 ];
 
-let scheduleState = {};
+const SCHEDULE_KEY = 'csihs-schedule';
+
+function loadSchedule() {
+  try {
+    const raw = localStorage.getItem(SCHEDULE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return (parsed && typeof parsed === 'object') ? parsed : {};
+  } catch (e) {
+    return {}; // corrupt data or storage unavailable — start fresh rather than crash
+  }
+}
+
+function saveSchedule() {
+  try { localStorage.setItem(SCHEDULE_KEY, JSON.stringify(scheduleState)); } catch (e) { /* private browsing, etc. */ }
+}
+
+let scheduleState = loadSchedule();
 let courseSearchQuery = '';
 
 function slugify(str) {
@@ -99,6 +115,7 @@ function escapeHTML(str) {
 }
 
 const THEME_KEY = 'csihs-theme';
+const SCREEN_KEY = 'csihs-screen';
 
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
@@ -136,27 +153,30 @@ function showScreen(name) {
   document.querySelectorAll('.nav-link').forEach(function (l) {
     l.classList.toggle('is-active', l.dataset.target === name);
   });
+  try { localStorage.setItem(SCREEN_KEY, name); } catch (e) { /* private browsing, etc. — screen just won't persist */ }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function courseCardHTML(course, id, showNode) {
-  const noteHTML = course.note ? '<p class="course__note">' + course.note + '</p>' : '';
+  const name = escapeHTML(course.name);
+  const prereq = escapeHTML(course.prereq);
+  const noteHTML = course.note ? '<p class="course__note">' + escapeHTML(course.note) + '</p>' : '';
   const options = BLOCKS.map(function (b) { return '<option value="' + b + '">Block ' + b + '</option>'; }).join('');
   return (
     '<div class="course">' +
       (showNode ? '<span class="course__node" aria-hidden="true"></span>' : '') +
       '<button class="course__header" data-course-id="' + id + '" aria-expanded="false">' +
-        '<span class="course__name">' + course.name + '</span>' +
+        '<span class="course__name">' + name + '</span>' +
         '<svg class="course__chevron" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       '</button>' +
       '<div class="course__body" id="body-' + id + '">' +
-        '<p class="course__prereq"><strong>Prerequisites:</strong> ' + course.prereq + '</p>' +
+        '<p class="course__prereq"><strong>Prerequisites:</strong> ' + prereq + '</p>' +
         noteHTML +
         '<div class="course__add">' +
-          '<select class="course__block-select" id="select-' + id + '" aria-label="Choose a block for ' + course.name + '">' +
+          '<select class="course__block-select" id="select-' + id + '" aria-label="Choose a block for ' + name + '">' +
             '<option value="">Choose a block...</option>' + options +
           '</select>' +
-          '<button type="button" class="btn-add" data-add-id="' + id + '" data-course-name="' + course.name + '">Add to Schedule</button>' +
+          '<button type="button" class="btn-add" data-add-id="' + id + '" data-course-name="' + name + '">Add to Schedule</button>' +
           '<span class="course__confirm" id="confirm-' + id + '" aria-live="polite"></span>' +
         '</div>' +
       '</div>' +
@@ -178,7 +198,7 @@ function renderCourses() {
     }).join('');
     return (
       '<div class="subject-group">' +
-        '<h2 class="subject-group__title">' + group.subject + '</h2>' +
+        '<h2 class="subject-group__title">' + escapeHTML(group.subject) + '</h2>' +
         '<div class="' + (group.path ? 'course-path' : 'course-grid') + '">' + cards + '</div>' +
       '</div>'
     );
@@ -211,6 +231,7 @@ function attachCourseEvents() {
         return;
       }
       scheduleState[select.value] = name;
+      saveSchedule();
       confirmEl.classList.remove('course__confirm--error');
       confirmEl.textContent = 'Added to Block ' + select.value + '.';
       renderSchedule();
@@ -228,13 +249,14 @@ function renderSchedule() {
       '<div class="schedule-row">' +
         '<div class="schedule-row__block">Block ' + block + '</div>' +
         '<input type="text" class="schedule-row__input" data-block="' + block + '" ' +
-          'placeholder="Type a class, or add one from Class Availability" value="' + value.replace(/"/g, '&quot;') + '">' +
+          'placeholder="Type a class, or add one from Class Availability" value="' + escapeHTML(value) + '">' +
       '</div>'
     );
   }).join('');
   grid.querySelectorAll('.schedule-row__input').forEach(function (input) {
     input.addEventListener('input', function (e) {
       scheduleState[e.target.dataset.block] = e.target.value;
+      saveSchedule();
     });
   });
 }
@@ -247,15 +269,15 @@ function renderSports(filter) {
   container.innerHTML = list.map(function (s) {
     const typeClass = s.type.indexOf('Open') === 0 ? 'badge--open' : 'badge--nocut';
     const seasonClass = 'badge--' + s.season.toLowerCase();
-    const noteHTML = s.note ? '<p class="activity-card__note">' + s.note + '</p>' : '';
+    const noteHTML = s.note ? '<p class="activity-card__note">' + escapeHTML(s.note) + '</p>' : '';
     return (
       '<div class="activity-card">' +
         '<div class="activity-card__top">' +
-          '<h3>' + s.name + '</h3>' +
-          '<span class="badge ' + seasonClass + '">' + s.season + '</span>' +
+          '<h3>' + escapeHTML(s.name) + '</h3>' +
+          '<span class="badge ' + seasonClass + '">' + escapeHTML(s.season) + '</span>' +
         '</div>' +
-        '<p class="activity-card__team">' + s.team + '</p>' +
-        '<span class="badge ' + typeClass + '">' + s.type + '</span>' +
+        '<p class="activity-card__team">' + escapeHTML(s.team) + '</p>' +
+        '<span class="badge ' + typeClass + '">' + escapeHTML(s.type) + '</span>' +
         noteHTML +
       '</div>'
     );
@@ -268,8 +290,8 @@ function renderClubs() {
   container.innerHTML = CLUBS.map(function (c) {
     return (
       '<div class="activity-card">' +
-        '<h3>' + c.name + '</h3>' +
-        '<p class="activity-card__meets">' + c.meets + '</p>' +
+        '<h3>' + escapeHTML(c.name) + '</h3>' +
+        '<p class="activity-card__meets">' + escapeHTML(c.meets) + '</p>' +
       '</div>'
     );
   }).join('');
@@ -293,6 +315,14 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.theme-toggle').forEach(function (btn) {
     btn.addEventListener('click', toggleTheme);
   });
+
+  const validScreens = ['menu', 'classes', 'schedule', 'extracurricular'];
+  let savedScreen = null;
+  try { savedScreen = localStorage.getItem(SCREEN_KEY); } catch (e) { /* private browsing, etc. */ }
+  if (savedScreen && validScreens.indexOf(savedScreen) !== -1) {
+    showScreen(savedScreen); // also clears the data-restore-screen flash-guard below, since the real state now matches
+  }
+  document.documentElement.removeAttribute('data-restore-screen');
 
   const continueBtn = document.getElementById('continueBtn');
   if (continueBtn) continueBtn.addEventListener('click', goToMenu);
@@ -325,6 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
     resetBtn.addEventListener('click', function () {
       if (window.confirm('Clear all classes from your schedule preview?')) {
         scheduleState = {};
+        saveSchedule();
         renderSchedule();
       }
     });
