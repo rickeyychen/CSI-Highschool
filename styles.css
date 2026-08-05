@@ -130,10 +130,11 @@ select:focus-visible {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Set by the inline script in <head> (before first paint) when a returning
-   visitor's last screen was saved. Forces straight to that screen and skips
-   the splash intro entirely, so a refresh doesn't flash back to "Click to
-   Continue." script.js removes this attribute once its own state takes over. */
+/* Set by the inline script in <head> (before first paint) when the URL
+   already has a screen hash — a refresh or a shared/bookmarked link. Forces
+   straight to that screen and skips the splash intro entirely, so reloading
+   #classes doesn't flash back to "Click to Continue" first.
+   script.js removes this attribute once renderScreen() takes over. */
 html[data-restore-screen] #screen-splash { display: none !important; }
 html[data-restore-screen] .site-nav { display: flex !important; }
 html[data-restore-screen] .site-footer { display: block !important; }
