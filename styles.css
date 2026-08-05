@@ -9,7 +9,7 @@
   --bg: #e9f3fc;
   --bg-alt: #dcebf9;
   --primary: #1c6fa8;
-  --primary-dark: #0f4c78;
+  --primary-strong: #0f4c78;
   --ink: #12293c;
   --ink-muted: #4c6c82;
   --card: #cfe7fa;
@@ -48,11 +48,11 @@
   --bg: #0d1b2a;
   --bg-alt: #13273c;
   --primary: #6cb8ef;
-  --primary-dark: #bfe0f8;
+  --primary-strong: #bfe0f8;
   --ink: #e7f1fa;
   --ink-muted: #93aec4;
-  --card: #16293d;
-  --card-hover: #1f3b54;
+  --card: #142132;
+  --card-hover: #24405c;
   --surface: #1c3247;
   --border: #2c4a64;
   --nav-bg: rgba(13, 27, 42, 0.9);
@@ -71,8 +71,11 @@
   --spring: #a6e3a1;
   --spring-bg: #163420;
 
-  --shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-  --shadow-hover: 0 10px 26px rgba(0, 0, 0, 0.45);
+  /* Black shadows barely register on a near-black background, so hover/active
+     states get a soft primary-tinted glow instead — this is what actually
+     reads as "lifted" here. */
+  --shadow: 0 3px 10px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(108, 184, 239, 0.07);
+  --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(108, 184, 239, 0.18);
 }
 
 /* ---------- Reset & base ---------- */
@@ -88,7 +91,7 @@ body {
 }
 h1, h2, h3 {
   font-family: 'Lora', Georgia, serif;
-  color: var(--primary-dark);
+  color: var(--primary-strong);
   line-height: 1.25;
   transition: color 0.3s ease;
 }
@@ -100,7 +103,7 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid var(--primary-dark);
+  outline: 3px solid var(--primary-strong);
   outline-offset: 2px;
 }
 
@@ -125,6 +128,20 @@ select:focus-visible {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Set by the inline script in <head> (before first paint) when a returning
+   visitor's last screen was saved. Forces straight to that screen and skips
+   the splash intro entirely, so a refresh doesn't flash back to "Click to
+   Continue." script.js removes this attribute once its own state takes over. */
+html[data-restore-screen] #screen-splash { display: none !important; }
+html[data-restore-screen] .site-nav { display: flex !important; }
+html[data-restore-screen] .site-footer { display: block !important; }
+html[data-restore-screen="menu"] #screen-menu,
+html[data-restore-screen="classes"] #screen-classes,
+html[data-restore-screen="schedule"] #screen-schedule,
+html[data-restore-screen="extracurricular"] #screen-extracurricular {
+  display: block !important;
 }
 
 /* Splash exit — plays on #screen-splash right before it's swapped out */
@@ -182,7 +199,7 @@ select:focus-visible {
   animation: slow-spin 150s linear infinite;
   transition: opacity 0.3s ease, color 0.3s ease;
 }
-[data-theme="dark"] .splash__watermark { opacity: 0.3; }
+[data-theme="dark"] .splash__watermark { opacity: 0.2; }
 .splash__watermark .wm-line {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -293,7 +310,7 @@ select:focus-visible {
   align-items: center;
   gap: 0.6rem;
   background: var(--card);
-  color: var(--primary-dark);
+  color: var(--primary-strong);
   border: 1px solid var(--border);
   font-weight: 600;
   font-size: 1.02rem;
@@ -316,7 +333,7 @@ select:focus-visible {
 .btn-secondary {
   background: transparent;
   border: 1px solid var(--border);
-  color: var(--primary-dark);
+  color: var(--primary-strong);
   padding: 0.6rem 1.3rem;
   border-radius: 999px;
   font-weight: 500;
@@ -336,7 +353,7 @@ select:focus-visible {
   transition: background-color var(--transition);
   white-space: nowrap;
 }
-.btn-add:hover { background: var(--primary-dark); }
+.btn-add:hover { background: var(--primary-strong); }
 [data-theme="dark"] .btn-add { background: #2678ab; color: #fff; }
 [data-theme="dark"] .btn-add:hover { background: #1f6291; }
 
@@ -405,7 +422,7 @@ select:focus-visible {
   font-family: 'Lora', serif;
   font-weight: 600;
   font-size: 1.05rem;
-  color: var(--primary-dark);
+  color: var(--primary-strong);
   padding: 0.4rem 0.65rem;
   border-radius: 10px;
   transition: background-color var(--transition);
@@ -416,7 +433,7 @@ select:focus-visible {
 .nav-link {
   background-color: var(--card);
   border: 1px solid transparent;
-  color: var(--primary-dark);
+  color: var(--primary-strong);
   font-weight: 500;
   font-size: 0.9rem;
   padding: 0.55rem 1rem;
@@ -508,7 +525,7 @@ select:focus-visible {
   flex-shrink: 0;
   transition: background-color var(--transition), color var(--transition);
 }
-.search-field__clear:hover { background: var(--card); color: var(--primary-dark); }
+.search-field__clear:hover { background: var(--card); color: var(--primary-strong); }
 .search-empty {
   color: var(--ink-muted);
   font-style: italic;
@@ -592,7 +609,7 @@ select:focus-visible {
   background: var(--surface);
   color: var(--ink);
 }
-.course__confirm { font-size: 0.85rem; color: var(--primary-dark); font-weight: 600; }
+.course__confirm { font-size: 0.85rem; color: var(--primary-strong); font-weight: 600; }
 .course__confirm--error { color: var(--fall); }
 
 /* ---------- Schedule screen ---------- */
@@ -611,7 +628,7 @@ select:focus-visible {
 .notice-banner--info {
   background: var(--bg-alt);
   border: 1px solid var(--border);
-  color: var(--primary-dark);
+  color: var(--primary-strong);
 }
 [data-theme="dark"] .notice-banner:not(.notice-banner--info) {
   background: #3a2c12;
@@ -638,7 +655,7 @@ select:focus-visible {
   transition: background-color var(--transition);
 }
 .schedule-row:hover, .schedule-row:focus-within { background: var(--card-hover); }
-.schedule-row__block { font-family: 'Lora', serif; font-weight: 600; color: var(--primary-dark); }
+.schedule-row__block { font-family: 'Lora', serif; font-weight: 600; color: var(--primary-strong); }
 .schedule-row__input {
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -658,7 +675,7 @@ select:focus-visible {
   gap: 0.5rem;
   background: var(--card);
   border: 1px solid var(--border);
-  color: var(--primary-dark);
+  color: var(--primary-strong);
   font-weight: 600;
   padding: 0.65rem 1.35rem;
   border-radius: 999px;
@@ -673,7 +690,7 @@ select:focus-visible {
 .season-filter-btn {
   background: var(--card);
   border: 1px solid var(--border);
-  color: var(--primary-dark);
+  color: var(--primary-strong);
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.4rem 0.95rem;
