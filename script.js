@@ -153,7 +153,7 @@ function showScreen(name) {
   document.querySelectorAll('.nav-link').forEach(function (l) {
     l.classList.toggle('is-active', l.dataset.target === name);
   });
-  try { localStorage.setItem(SCREEN_KEY, name); } catch (e) { /* private browsing, etc. — screen just won't persist */ }
+  try { sessionStorage.setItem(SCREEN_KEY, name); } catch (e) { /* private browsing, etc. — screen just won't persist */ }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const validScreens = ['menu', 'classes', 'schedule', 'extracurricular'];
   let savedScreen = null;
-  try { savedScreen = localStorage.getItem(SCREEN_KEY); } catch (e) { /* private browsing, etc. */ }
+  try { savedScreen = sessionStorage.getItem(SCREEN_KEY); } catch (e) { /* private browsing, etc. */ }
   if (savedScreen && validScreens.indexOf(savedScreen) !== -1) {
     showScreen(savedScreen); // also clears the data-restore-screen flash-guard below, since the real state now matches
   }
